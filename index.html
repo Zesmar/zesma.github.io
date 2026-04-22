@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meu Planejamento Semanal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0f0f;
+  --surface: #1a1a1a;
+  --surface2: #222222;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
+  --text: #f0ede8;
+  --text2: #888880;
+  --text3: #555550;
+  --accent: #c8f080;
+  --accent2: #a0d060;
+
+  --biblia:    #b8a9f8;
+  --livro:     #7ec8e8;
+  --violino:   #78ddb8;
+  --corrida:   #f4a878;
+  --academia:  #98d878;
+  --ingles:    #f8d878;
+  --portugues: #f898c8;
+
+  --biblia-bg:    rgba(184,169,248,0.12);
+  --livro-bg:     rgba(126,200,232,0.12);
+  --violino-bg:   rgba(120,221,184,0.12);
+  --corrida-bg:   rgba(244,168,120,0.12);
+  --academia-bg:  rgba(152,216,120,0.12);
+  --ingles-bg:    rgba(248,216,120,0.12);
+  --portugues-bg: rgba(248,152,200,0.12);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 0 0 60px;
+}
+
+/* NAV */
+nav {
+  display: flex;
+  gap: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+nav button {
+  flex: 1;
+  padding: 16px 8px;
+  background: none;
+  border: none;
+  color: var(--text2);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s;
+  border-bottom: 2px solid transparent;
+  letter-spacing: 0.03em;
+}
+nav button.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* HEADER */
+.header {
+  padding: 32px 20px 20px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+.header h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.1;
+  color: var(--text);
+}
+.header h1 em {
+  font-style: italic;
+  color: var(--accent);
+}
+.week-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.week-nav button {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.week-nav button:hover { background: var(--border2); }
+.week-nav span {
+  font-size: 12px;
+  color: var(--text2);
+  min-width: 60px;
+  text-align: center;
+}
+
+/* PAGE SECTIONS */
+.page { display: none; padding: 0 16px; }
+.page.active { display: block; }
+
+/* OVERALL PROGRESS */
+.overall-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.overall-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.overall-pct {
+  font-family: 'DM Serif Display', serif;
+  font-size: 48px;
+  color: var(--accent);
+  line-height: 1;
+}
+.overall-label {
+  font-size: 12px;
+  color: var(--text2);
+  margin-top: 4px;
+}
+.ring-wrap {
+  position: relative;
+  width: 72px; height: 72px;
+}
+.ring-wrap svg { transform: rotate(-90deg); }
+.ring-bg { fill: none; stroke: var(--border2); stroke-width: 6; }
+.ring-fill { fill: none; stroke: var(--accent); stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.5s; }
+.ring-text {
+  position: absolute;
+  inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 600; color: var(--accent);
+}
+
+/* WEEK GRID */
+.week-label {
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  padding: 0 2px;
+}
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 20px;
+}
+.day-col {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px 4px;
+  min-height: 180px;
+}
+.day-head {
+  text-align: center;
+  margin-bottom: 8px;
+}
+.day-name {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: block;
+}
+.day-num {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text);
+  display: block;
+  margin-top: 1px;
+}
+.day-num.today { color: var(--accent); }
+.day-tasks { display: flex; flex-direction: column; gap: 4px; }
+
+.chip {
+  border-radius: 6px;
+  padding: 4px 5px;
+  font-size: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  user-select: none;
+  transition: opacity 0.15s, transform 0.1s;
+  line-height: 1.2;
+}
+.chip:active { transform: scale(0.94); }
+.chip.done { opacity: 0.3; text-decoration: line-through; }
+
+.chip-biblia    { background: var(--biblia-bg);    color: var(--biblia); }
+.chip-livro     { background: var(--livro-bg);     color: var(--livro); }
+.chip-violino   { background: var(--violino-bg);   color: var(--violino); }
+.chip-corrida   { background: var(--corrida-bg);   color: var(--corrida); }
+.chip-academia  { background: var(--academia-bg);  color: var(--academia); }
+.chip-ingles    { background: var(--ingles-bg);    color: var(--ingles); }
+.chip-portugues { background: var(--portugues-bg); color: var(--portugues); }
+
+/* METAS */
+.metas-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.meta-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+}
+.meta-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.meta-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.meta-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  flex: 1;
+  margin-left: 8px;
+}
+.meta-count {
+  font-size: 12px;
+  color: var(--text2);
+}
+.progress-bar-bg {
+  height: 6px;
+  background: var(--border2);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+  min-width: 4px;
+}
+.meta-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.meta-slider-row input[type=range] {
+  flex: 1;
+  accent-color: var(--accent);
+  height: 4px;
+}
+.meta-slider-label {
+  font-size: 11px;
+  color: var(--text3);
+  min-width: 28px;
+  text-align: right;
+}
+
+/* RESET */
+.reset-btn {
+  background: none;
+  border: 1px solid var(--border2);
+  color: var(--text3);
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  transition: color 0.15s, border-color 0.15s;
+  display: block;
+  margin: 0 auto 20px;
+}
+.reset-btn:hover { color: var(--text2); border-color: var(--text2); }
+
+/* HISTÓRICO */
+.hist-section-title {
+  font-size: 11px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 20px 0 10px;
+}
+.hist-week {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 10px;
+}
+.hist-week-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.hist-week-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+.hist-week-pct {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.hist-bars { display: flex; flex-direction: column; gap: 7px; }
+.hist-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hist-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.hist-task-name { font-size: 12px; color: var(--text2); width: 72px; flex-shrink: 0; }
+.hist-bar-bg { flex: 1; height: 5px; background: var(--border2); border-radius: 8px; overflow: hidden; }
+.hist-bar-fill { height: 100%; border-radius: 8px; }
+.hist-num { font-size: 11px; color: var(--text3); min-width: 32px; text-align: right; }
+
+.empty-hist {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text3);
+  font-size: 14px;
+}
+
+/* STATS */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+}
+.stat-val {
+  font-family: 'DM Serif Display', serif;
+  font-size: 32px;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-label {
+  font-size: 12px;
+  color: var(--text2);
+}
+.streak-fire { font-size: 22px; margin-bottom: 4px; }
+
+.best-activity {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 10px;
+}
+.best-title {
+  font-size: 11px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+}
+.best-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.best-left { display: flex; align-items: center; gap: 8px; }
+.best-bar-wrap { flex: 1; height: 4px; background: var(--border2); border-radius: 4px; overflow: hidden; margin: 0 10px; }
+.best-bar { height: 100%; border-radius: 4px; }
+.best-count { font-size: 12px; color: var(--text2); min-width: 30px; text-align: right; }
+</style>
+</head>
+<body>
+
+<nav>
+  <button class="active" onclick="showPage('semana')">Semana</button>
+  <button onclick="showPage('historico')">Histórico</button>
+  <button onclick="showPage('stats')">Progresso</button>
+</nav>
+
+<div class="header">
+  <h1 id="pageTitle">Semana <em>atual</em></h1>
+  <div class="week-nav" id="weekNavEl">
+    <button onclick="changeWeek(-1)">‹</button>
+    <span id="weekNavLabel">esta sem.</span>
+    <button onclick="changeWeek(1)">›</button>
+  </div>
+</div>
+
+<!-- PAGE: SEMANA -->
+<div class="page active" id="page-semana">
+  <div class="overall-card">
+    <div class="overall-top">
+      <div>
+        <div class="overall-pct" id="overallPct">0%</div>
+        <div class="overall-label">progresso geral da semana</div>
+      </div>
+      <div class="ring-wrap">
+        <svg width="72" height="72" viewBox="0 0 72 72">
+          <circle class="ring-bg" cx="36" cy="36" r="30"/>
+          <circle class="ring-fill" id="ringFill" cx="36" cy="36" r="30"
+            stroke-dasharray="188.5" stroke-dashoffset="188.5"/>
+        </svg>
+        <div class="ring-text" id="ringText">0%</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="week-label" id="weekRangeLabel">—</div>
+  <div class="week-grid" id="weekGrid"></div>
+
+  <div class="week-label">metas semanais</div>
+  <div class="metas-grid" id="metasGrid"></div>
+
+  <button class="reset-btn" onclick="resetCurrentWeek()">↺ reiniciar semana</button>
+</div>
+
+<!-- PAGE: HISTÓRICO -->
+<div class="page" id="page-historico">
+  <div id="histContent"></div>
+</div>
+
+<!-- PAGE: STATS -->
+<div class="page" id="page-stats">
+  <div class="stats-grid" id="statsGrid"></div>
+  <div class="best-activity" id="bestActivity"></div>
+</div>
+
+<script>
+const TASKS = [
+  { key:'biblia',    label:'Bíblia',    color:'var(--biblia)',    cls:'chip-biblia' },
+  { key:'livro',     label:'Livro',     color:'var(--livro)',     cls:'chip-livro' },
+  { key:'violino',   label:'Violino',   color:'var(--violino)',   cls:'chip-violino' },
+  { key:'corrida',   label:'Corrida',   color:'var(--corrida)',   cls:'chip-corrida' },
+  { key:'academia',  label:'Academia',  color:'var(--academia)',  cls:'chip-academia' },
+  { key:'ingles',    label:'Inglês',    color:'var(--ingles)',    cls:'chip-ingles' },
+  { key:'portugues', label:'Português', color:'var(--portugues)', cls:'chip-portugues' },
+];
+
+const DAY_NAMES = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const DAY_NAMES_FULL = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+let viewOffset = 0; // weeks from current
+
+function getMonday(d) {
+  const dt = new Date(d);
+  const day = dt.getDay();
+  const diff = (day === 0) ? -6 : 1 - day;
+  dt.setDate(dt.getDate() + diff);
+  dt.setHours(0,0,0,0);
+  return dt;
+}
+
+function weekKey(mondayDate) {
+  return mondayDate.toISOString().slice(0,10);
+}
+
+function getWeekDays(mondayDate) {
+  return Array.from({length:7}, (_,i) => {
+    const d = new Date(mondayDate);
+    d.setDate(d.getDate() + i);
+    return d;
+  });
+}
+
+function loadData() {
+  try { return JSON.parse(localStorage.getItem('planner_data') || '{}'); }
+  catch { return {}; }
+}
+
+function saveData(data) {
+  localStorage.setItem('planner_data', JSON.stringify(data));
+}
+
+function getWeekData(wk) {
+  const data = loadData();
+  if (!data[wk]) {
+    data[wk] = { done: {}, metas: {} };
+    const days = getWeekDays(new Date(wk));
+    days.forEach(d => {
+      const dk = d.toISOString().slice(0,10);
+      data[wk].done[dk] = {};
+      TASKS.forEach(t => data[wk].done[dk][t.key] = false);
+    });
+    TASKS.forEach(t => data[wk].metas[t.key] = 3);
+    saveData(data);
+  }
+  return data[wk];
+}
+
+function getCurrentMonday() {
+  const base = getMonday(new Date());
+  base.setDate(base.getDate() + viewOffset * 7);
+  return base;
+}
+
+function countTaskDone(wkData, key) {
+  return Object.values(wkData.done).reduce((acc, dayObj) => acc + (dayObj[key] ? 1 : 0), 0);
+}
+
+function calcWeekProgress(wkData) {
+  let total = 0, done = 0;
+  TASKS.forEach(t => {
+    const meta = wkData.metas[t.key] || 3;
+    total += meta;
+    done += Math.min(countTaskDone(wkData, t.key), meta);
+  });
+  return total === 0 ? 0 : Math.round((done / total) * 100);
+}
+
+function formatDate(d) {
+  return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' });
+}
+
+// ── RENDER SEMANA ──
+function renderSemana() {
+  const monday = getCurrentMonday();
+  const wk = weekKey(monday);
+  const days = getWeekDays(monday);
+  const wkData = getWeekData(wk);
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  // week nav label
+  const isCurrentWeek = viewOffset === 0;
+  document.getElementById('weekNavLabel').textContent = isCurrentWeek ? 'esta sem.' :
+    (viewOffset < 0 ? `${Math.abs(viewOffset)} sem. atrás` : `+${viewOffset} sem.`);
+
+  // week range label
+  document.getElementById('weekRangeLabel').textContent =
+    `${formatDate(days[0])} — ${formatDate(days[6])}`;
+
+  // overall progress
+  const pct = calcWeekProgress(wkData);
+  document.getElementById('overallPct').textContent = pct + '%';
+  document.getElementById('ringText').textContent = pct + '%';
+  const circ = 188.5;
+  document.getElementById('ringFill').style.strokeDashoffset = circ - (circ * pct / 100);
+
+  // week grid
+  const grid = document.getElementById('weekGrid');
+  grid.innerHTML = '';
+  days.forEach(d => {
+    const dk = d.toISOString().slice(0,10);
+    const isToday = d.getTime() === today.getTime();
+    const col = document.createElement('div');
+    col.className = 'day-col';
+    col.innerHTML = `
+      <div class="day-head">
+        <span class="day-name">${DAY_NAMES[d.getDay()]}</span>
+        <span class="day-num${isToday?' today':''}">${d.getDate()}</span>
+      </div>
+      <div class="day-tasks" id="dt-${dk}"></div>`;
+    grid.appendChild(col);
+
+    const tasksDiv = col.querySelector(`#dt-${dk}`);
+    TASKS.forEach(t => {
+      const done = wkData.done[dk]?.[t.key];
+      const chip = document.createElement('div');
+      chip.className = `chip ${t.cls}${done?' done':''}`;
+      chip.textContent = t.label;
+      chip.onclick = () => {
+        const data = loadData();
+        if (!data[wk].done[dk]) data[wk].done[dk] = {};
+        data[wk].done[dk][t.key] = !data[wk].done[dk][t.key];
+        saveData(data);
+        renderSemana();
+        renderMetas();
+      };
+      tasksDiv.appendChild(chip);
+    });
+  });
+
+  renderMetas();
+}
+
+function renderMetas() {
+  const monday = getCurrentMonday();
+  const wk = weekKey(monday);
+  const wkData = getWeekData(wk);
+  const grid = document.getElementById('metasGrid');
+  grid.innerHTML = '';
+
+  TASKS.forEach(t => {
+    const done = countTaskDone(wkData, t.key);
+    const meta = wkData.metas[t.key] || 3;
+    const pct = Math.min(100, Math.round((done / meta) * 100));
+
+    const card = document.createElement('div');
+    card.className = 'meta-card';
+    card.innerHTML = `
+      <div class="meta-card-top">
+        <div class="meta-dot" style="background:${t.color}"></div>
+        <span class="meta-name">${t.label}</span>
+        <span class="meta-count">${done}/${meta}</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" style="width:${pct}%;background:${t.color}"></div>
+      </div>
+      <div class="meta-slider-row">
+        <input type="range" min="1" max="7" value="${meta}" step="1" data-wk="${wk}" data-key="${t.key}">
+        <span class="meta-slider-label">${meta}×/sem</span>
+      </div>`;
+    grid.appendChild(card);
+
+    const slider = card.querySelector('input[type=range]');
+    slider.addEventListener('input', function() {
+      const data = loadData();
+      data[wk].metas[t.key] = parseInt(this.value);
+      saveData(data);
+      renderMetas();
+      renderSemana();
+    });
+  });
+}
+
+function resetCurrentWeek() {
+  if (!confirm('Reiniciar todos os registros desta semana?')) return;
+  const wk = weekKey(getCurrentMonday());
+  const data = loadData();
+  if (data[wk]) {
+    Object.keys(data[wk].done).forEach(dk => {
+      TASKS.forEach(t => data[wk].done[dk][t.key] = false);
+    });
+    saveData(data);
+    renderSemana();
+  }
+}
+
+// ── RENDER HISTÓRICO ──
+function renderHistorico() {
+  const data = loadData();
+  const keys = Object.keys(data).sort().reverse();
+  const cont = document.getElementById('histContent');
+
+  if (keys.length === 0) {
+    cont.innerHTML = '<div class="empty-hist">Nenhum histórico ainda.<br>Comece a marcar suas atividades!</div>';
+    return;
+  }
+
+  cont.innerHTML = '';
+  let firstTitle = true;
+  keys.forEach(wk => {
+    const wkData = data[wk];
+    const monday = new Date(wk);
+    const sunday = new Date(wk); sunday.setDate(sunday.getDate() + 6);
+    const pct = calcWeekProgress(wkData);
+
+    if (firstTitle) {
+      const lbl = document.createElement('div');
+      lbl.className = 'hist-section-title';
+      lbl.textContent = 'semanas anteriores';
+      cont.appendChild(lbl);
+      firstTitle = false;
+    }
+
+    const card = document.createElement('div');
+    card.className = 'hist-week';
+    card.innerHTML = `
+      <div class="hist-week-head">
+        <span class="hist-week-label">${formatDate(monday)} — ${formatDate(sunday)}</span>
+        <span class="hist-week-pct">${pct}%</span>
+      </div>
+      <div class="hist-bars" id="hb-${wk}"></div>`;
+    cont.appendChild(card);
+
+    const barsDiv = card.querySelector(`#hb-${wk}`);
+    TASKS.forEach(t => {
+      const done = countTaskDone(wkData, t.key);
+      const meta = wkData.metas[t.key] || 3;
+      const pct2 = Math.min(100, Math.round((done / meta) * 100));
+      const row = document.createElement('div');
+      row.className = 'hist-row';
+      row.innerHTML = `
+        <div class="hist-dot" style="background:${t.color}"></div>
+        <span class="hist-task-name">${t.label}</span>
+        <div class="hist-bar-bg"><div class="hist-bar-fill" style="width:${pct2}%;background:${t.color}"></div></div>
+        <span class="hist-num">${done}/${meta}</span>`;
+      barsDiv.appendChild(row);
+    });
+  });
+}
+
+// ── RENDER STATS ──
+function renderStats() {
+  const data = loadData();
+  const keys = Object.keys(data).sort();
+
+  // total por atividade em todas as semanas
+  const totals = {};
+  TASKS.forEach(t => totals[t.key] = 0);
+  let totalWeeks = keys.length;
+  let totalDays = 0;
+  let totalDone = 0;
+
+  keys.forEach(wk => {
+    const wkData = data[wk];
+    TASKS.forEach(t => {
+      const d = countTaskDone(wkData, t.key);
+      totals[t.key] += d;
+      totalDone += d;
+    });
+    Object.values(wkData.done).forEach(dayObj => {
+      const anyDone = Object.values(dayObj).some(v => v);
+      if (anyDone) totalDays++;
+    });
+  });
+
+  // streak atual (semanas consecutivas com >0% progresso)
+  let streak = 0;
+  for (let i = keys.length - 1; i >= 0; i--) {
+    if (calcWeekProgress(data[keys[i]]) > 0) streak++;
+    else break;
+  }
+
+  const sg = document.getElementById('statsGrid');
+  sg.innerHTML = `
+    <div class="stat-card">
+      <div class="stat-val">${totalDone}</div>
+      <div class="stat-label">atividades concluídas</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">${totalWeeks}</div>
+      <div class="stat-label">semanas registradas</div>
+    </div>
+    <div class="stat-card">
+      <div class="streak-fire">🔥</div>
+      <div class="stat-val">${streak}</div>
+      <div class="stat-label">semanas seguidas</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">${totalDays}</div>
+      <div class="stat-label">dias ativos</div>
+    </div>`;
+
+  // melhor atividade
+  const maxTotal = Math.max(...TASKS.map(t => totals[t.key]), 1);
+  const ba = document.getElementById('bestActivity');
+  ba.innerHTML = `<div class="best-title">total por atividade (todas as semanas)</div>`;
+  const sorted = [...TASKS].sort((a,b) => totals[b.key] - totals[a.key]);
+  sorted.forEach(t => {
+    const row = document.createElement('div');
+    row.className = 'best-row';
+    row.innerHTML = `
+      <div class="best-left">
+        <div class="hist-dot" style="background:${t.color}"></div>
+        <span style="font-size:12px;color:var(--text2);width:72px">${t.label}</span>
+      </div>
+      <div class="best-bar-wrap"><div class="best-bar" style="width:${Math.round(totals[t.key]/maxTotal*100)}%;background:${t.color}"></div></div>
+      <span class="best-count">${totals[t.key]}</span>`;
+    ba.appendChild(row);
+  });
+}
+
+// ── NAV ──
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  event.target.classList.add('active');
+
+  document.getElementById('weekNavEl').style.display = id === 'semana' ? 'flex' : 'none';
+
+  const titles = { semana: 'Semana <em>atual</em>', historico: 'Meu <em>histórico</em>', stats: 'Meu <em>progresso</em>' };
+  document.getElementById('pageTitle').innerHTML = titles[id];
+
+  if (id === 'semana') renderSemana();
+  if (id === 'historico') renderHistorico();
+  if (id === 'stats') renderStats();
+}
+
+function changeWeek(dir) {
+  viewOffset += dir;
+  if (viewOffset > 0) viewOffset = 0;
+  renderSemana();
+}
+
+// INIT
+renderSemana();
+</script>
+</body>
+</html>
